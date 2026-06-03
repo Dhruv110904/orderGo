@@ -19,12 +19,12 @@ import Link from "next/link";
 const productFormSchema = z.object({
   name: z.string().min(1, "Name is required").max(255),
   sku: z.string().min(1, "SKU is required").max(100),
-  description: z.string().optional().nullable().default(""),
-  category: z.string().optional().nullable().default(""),
+  description: z.string(),
+  category: z.string(),
   baseUnit: z.enum(["g", "mL", "unit"]),
-  basePricePerUnit: z.coerce.number().positive("Base price per unit must be positive"),
-  stockQuantity: z.coerce.number().nonnegative("Stock quantity cannot be negative"),
-  isActive: z.boolean().default(true),
+  basePricePerUnit: z.number().positive("Base price per unit must be positive"),
+  stockQuantity: z.number().nonnegative("Stock quantity cannot be negative"),
+  isActive: z.boolean(),
 });
 
 type ProductFormValues = z.infer<typeof productFormSchema>;
@@ -213,7 +213,7 @@ export default function ProductFormClient({ initialProduct }: ProductFormClientP
                   step="0.000001"
                   disabled={isLoading}
                   className="bg-slate-950/60 border-slate-850 text-slate-100 focus:border-indigo-500 focus:ring-indigo-500"
-                  {...register("basePricePerUnit")}
+                  {...register("basePricePerUnit", { valueAsNumber: true })}
                 />
                 {errors.basePricePerUnit && (
                   <p className="text-xs text-rose-500 mt-1">{errors.basePricePerUnit.message}</p>
@@ -230,7 +230,7 @@ export default function ProductFormClient({ initialProduct }: ProductFormClientP
                   step="0.000001"
                   disabled={isLoading}
                   className="bg-slate-950/60 border-slate-850 text-slate-100 focus:border-indigo-500 focus:ring-indigo-500"
-                  {...register("stockQuantity")}
+                  {...register("stockQuantity", { valueAsNumber: true })}
                 />
                 {errors.stockQuantity && (
                   <p className="text-xs text-rose-500 mt-1">{errors.stockQuantity.message}</p>
