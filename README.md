@@ -199,8 +199,8 @@ Open [http://localhost:3000](http://localhost:3000) to access the application.
   * Email: `admin@aasa.com`
   * Password: `Admin@123`
 * **Seller Profile**
-  * Email: `seller@aasa.com`
-  * Password: `Seller@123`
+  * Email: `user@aasa.com`
+  * Password: `User@123`
 
 ---
 
