@@ -1,25 +1,25 @@
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { CartProvider } from "@/context/CartContext";
-import SellerNavClient from "./SellerNavClient";
+import UserNavClient from "./UserNavClient";
 
-export default async function SellerLayout({
+export default async function UserLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   const session = await auth();
 
-  // Guard: Ensure user is logged in and has the seller role
-  if (!session || session.user.role !== "seller") {
+  // Guard: Ensure user is logged in and has the user role
+  if (!session || session.user.role !== "user") {
     redirect("/login");
   }
 
   const links = [
-    { name: "Dashboard", href: "/seller/dashboard", icon: "dashboard" },
-    { name: "Product Catalog", href: "/seller/products", icon: "catalog" },
-    { name: "Shopping Cart", href: "/seller/cart", icon: "cart", isCart: true },
-    { name: "Order History", href: "/seller/orders", icon: "orders" },
+    { name: "Dashboard", href: "/user/dashboard", icon: "dashboard" },
+    { name: "Product Catalog", href: "/user/products", icon: "catalog" },
+    { name: "Shopping Cart", href: "/user/cart", icon: "cart", isCart: true },
+    { name: "Order History", href: "/user/orders", icon: "orders" },
   ];
 
   return (
@@ -34,12 +34,12 @@ export default async function SellerLayout({
             </div>
             <div>
               <h1 className="text-lg font-bold text-white leading-none">orderGo</h1>
-              <span className="text-[10px] text-emerald-400 font-semibold uppercase tracking-wider">Seller Portal</span>
+              <span className="text-[10px] text-emerald-400 font-semibold uppercase tracking-wider">User Portal</span>
             </div>
           </div>
 
           {/* Sidebar Links */}
-          <SellerNavClient links={links} user={session.user} />
+          <UserNavClient links={links} user={session.user} />
         </aside>
 
         {/* Main Content Area */}
@@ -51,9 +51,9 @@ export default async function SellerLayout({
                 <span className="text-white font-extrabold text-sm">oG</span>
               </div>
               <h1 className="text-md font-bold text-white">orderGo</h1>
-              <span className="ml-2 px-1.5 py-0.5 rounded text-[8px] bg-emerald-900/60 border border-emerald-700/50 text-emerald-200 uppercase font-semibold">Seller</span>
+              <span className="ml-2 px-1.5 py-0.5 rounded text-[8px] bg-emerald-900/60 border border-emerald-700/50 text-emerald-200 uppercase font-semibold">User</span>
             </div>
-            <SellerNavClient links={links} user={session.user} isMobileHeader={true} />
+            <UserNavClient links={links} user={session.user} isMobileHeader={true} />
           </header>
 
           {/* Dynamic page content */}

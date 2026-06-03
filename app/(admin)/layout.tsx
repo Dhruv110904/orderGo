@@ -19,7 +19,7 @@ export default async function AdminLayout({
     { name: "Dashboard", href: "/admin/dashboard", icon: "dashboard" },
     { name: "Products", href: "/admin/products", icon: "products" },
     { name: "Orders", href: "/admin/orders", icon: "orders" },
-    { name: "Sellers", href: "/admin/users", icon: "users" },
+    { name: "Users", href: "/admin/users", icon: "users" },
   ];
 
   return (

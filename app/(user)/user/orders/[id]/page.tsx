@@ -11,7 +11,7 @@ import { ArrowLeft, Clock, CheckCircle, XCircle, ChevronRight, MessageSquare, Al
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 
-interface SellerOrderDetailPageProps {
+interface UserOrderDetailPageProps {
   params: {
     id: string;
   };
@@ -19,9 +19,9 @@ interface SellerOrderDetailPageProps {
 
 export const revalidate = 0; // live order updates
 
-export default async function SellerOrderDetailPage({ params }: SellerOrderDetailPageProps) {
+export default async function UserOrderDetailPage({ params }: UserOrderDetailPageProps) {
   const session = await auth();
-  if (!session || session.user.role !== "seller") {
+  if (!session || session.user.role !== "user") {
     redirect("/login");
   }
 
@@ -38,9 +38,9 @@ export default async function SellerOrderDetailPage({ params }: SellerOrderDetai
     notFound();
   }
 
-  // Guard: Ensure this seller owns the order
+  // Guard: Ensure this user owns the order
   if (order.userId !== session.user.id) {
-    redirect("/seller/orders");
+    redirect("/user/orders");
   }
 
   // 2. Fetch order items joined with products
@@ -93,7 +93,7 @@ export default async function SellerOrderDetailPage({ params }: SellerOrderDetai
     <div className="space-y-6">
       {/* Back Link */}
       <div className="flex items-center gap-4">
-        <Link href="/seller/orders" className="text-slate-400 hover:text-white transition-colors">
+        <Link href="/user/orders" className="text-slate-400 hover:text-white transition-colors">
           <ArrowLeft className="h-5 w-5" />
         </Link>
         <div>

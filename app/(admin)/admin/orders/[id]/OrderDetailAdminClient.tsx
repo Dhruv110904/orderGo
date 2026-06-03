@@ -34,8 +34,8 @@ interface Order {
   createdAt: Date | null;
   updatedAt: Date | null;
   userId: string | null;
-  sellerName: string | null;
-  sellerEmail: string | null;
+  userName: string | null;
+  userEmail: string | null;
 }
 
 interface OrderDetailAdminClientProps {
@@ -132,7 +132,7 @@ export default function OrderDetailAdminClient({ order, items }: OrderDetailAdmi
             <CardHeader className="border-b border-slate-800/60">
               <CardTitle className="text-lg font-semibold text-white">Order Summary</CardTitle>
               <CardDescription className="text-slate-400">
-                Submitted by {order.sellerName} ({order.sellerEmail})
+                Submitted by {order.userName} ({order.userEmail})
               </CardDescription>
             </CardHeader>
             <CardContent className="pt-6 grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
@@ -149,7 +149,7 @@ export default function OrderDetailAdminClient({ order, items }: OrderDetailAdmi
                 </span>
               </div>
               <div className="space-y-1">
-                <span className="text-slate-550 block text-xs">Seller ID</span>
+                <span className="text-slate-550 block text-xs">User ID</span>
                 <span className="font-mono text-xs text-slate-350">{order.userId}</span>
               </div>
               <div className="space-y-1">
@@ -233,7 +233,7 @@ export default function OrderDetailAdminClient({ order, items }: OrderDetailAdmi
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-semibold text-slate-450 flex items-center gap-1.5">
                   <MessageSquare className="h-4 w-4 text-indigo-400" />
-                  Seller Notes
+                  User Notes
                 </CardTitle>
               </CardHeader>
               <CardContent className="text-sm text-slate-300 italic bg-slate-950/40 p-4 rounded-lg border border-slate-850 mx-6 mb-6">
@@ -294,7 +294,7 @@ export default function OrderDetailAdminClient({ order, items }: OrderDetailAdmi
               <div className="flex gap-2">
                 <AlertCircle className="h-4 w-4 text-amber-400 flex-shrink-0" />
                 <p>
-                  <strong>Pending</strong>: Order is placed. Stock has not been decremented yet. Sellers can edit/cancel.
+                  <strong>Pending</strong>: Order is placed. Stock has not been decremented yet. Users can edit/cancel.
                 </p>
               </div>
               <div className="flex gap-2">

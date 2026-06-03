@@ -10,7 +10,7 @@ export const users = pgTable("users", {
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
 }, (table) => {
   return {
-    roleCheck: check("role_check", sql`${table.role} IN ('admin', 'seller')`),
+    roleCheck: check("role_check", sql`${table.role} IN ('admin', 'user')`),
   };
 });
 

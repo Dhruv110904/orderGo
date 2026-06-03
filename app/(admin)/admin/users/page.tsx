@@ -34,8 +34,8 @@ export default async function AdminUsersPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-white">Sellers & Users</h1>
-          <p className="text-slate-400 text-sm mt-1">Manage system user profiles and authorize sellers.</p>
+          <h1 className="text-3xl font-bold tracking-tight text-white">System Users</h1>
+          <p className="text-slate-400 text-sm mt-1">Manage system user profiles and roles.</p>
         </div>
         <Link href="/register">
           <Button className="bg-gradient-to-r from-indigo-600 to-emerald-600 hover:from-indigo-500 hover:to-emerald-500 text-white shadow-lg shadow-indigo-600/10">

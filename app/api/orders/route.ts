@@ -39,13 +39,13 @@ export async function GET(req: NextRequest) {
           notes: orders.notes,
           createdAt: orders.createdAt,
           updatedAt: orders.updatedAt,
-          sellerName: users.name,
-          sellerEmail: users.email,
+          userName: users.name,
+          userEmail: users.email,
         })
         .from(orders)
         .leftJoin(users, eq(orders.userId, users.id));
     } else {
-      // Sellers see only their own orders
+      // Users see only their own orders
       orderQuery = db
         .select({
           id: orders.id,
@@ -54,8 +54,8 @@ export async function GET(req: NextRequest) {
           notes: orders.notes,
           createdAt: orders.createdAt,
           updatedAt: orders.updatedAt,
-          sellerName: users.name,
-          sellerEmail: users.email,
+          userName: users.name,
+          userEmail: users.email,
         })
         .from(orders)
         .leftJoin(users, eq(orders.userId, users.id))
@@ -127,11 +127,11 @@ export async function POST(req: NextRequest) {
         const baseQty = toBaseUnit(item.orderedQuantity, item.orderedUnit);
         const productStock = parseFloat(product.stockQuantity);
 
-        // Seller-side soft warning check:
+        // User-side soft warning check:
         // We can let order creation go through or block it. Let's block if item has absolutely no stock,
         // but let's allow it as "Quotation" if stock is insufficient but positive.
         // To be strict, we'll allow pending orders but let the admin do the hard check at confirmation.
-        // However, if the seller requests more than available, let's log/allow but show warnings in UI.
+        // However, if the user requests more than available, let's log/allow but show warnings in UI.
 
         const basePrice = parseFloat(product.basePricePerUnit);
         const orderedPrice = pricePerOrderedUnit(basePrice, item.orderedUnit);

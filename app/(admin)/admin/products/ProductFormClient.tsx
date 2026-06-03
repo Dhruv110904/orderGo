@@ -273,7 +273,7 @@ export default function ProductFormClient({ initialProduct }: ProductFormClientP
                   {...register("isActive")}
                 />
                 <Label htmlFor="isActive" className="text-slate-300 text-sm font-normal cursor-pointer select-none">
-                  Product is active and visible to sellers
+                  Product is active and visible to users
                 </Label>
               </div>
             )}

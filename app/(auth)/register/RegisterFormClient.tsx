@@ -18,7 +18,7 @@ const registerSchema = z.object({
   name: z.string().min(1, "Name is required").max(255),
   email: z.string().email("Invalid email address"),
   password: z.string().min(6, "Password must be at least 6 characters"),
-  role: z.enum(["admin", "seller"]),
+  role: z.enum(["admin", "user"]),
 });
 
 type RegisterFormValues = z.infer<typeof registerSchema>;
@@ -39,7 +39,7 @@ export default function RegisterFormClient() {
       name: "",
       email: "",
       password: "",
-      role: "seller",
+      role: "user",
     },
   });
 
@@ -90,7 +90,7 @@ export default function RegisterFormClient() {
 
         <div className="flex flex-col items-center justify-center mb-6">
           <h2 className="text-2xl font-extrabold text-white tracking-tight">Create User Account</h2>
-          <p className="text-slate-400 text-sm mt-1">Register a new Admin or Seller</p>
+          <p className="text-slate-400 text-sm mt-1">Register a new Admin or User</p>
         </div>
 
         <Card className="border-slate-800 bg-slate-900/50 backdrop-blur-md shadow-2xl text-slate-100">
@@ -171,15 +171,15 @@ export default function RegisterFormClient() {
                 <div className="relative">
                   <Shield className="absolute left-3 top-3.5 h-4.5 w-4.5 text-slate-500 z-10" />
                   <Select
-                    onValueChange={(val) => setValue("role", val as "admin" | "seller")}
-                    defaultValue="seller"
+                    onValueChange={(val) => setValue("role", val as "admin" | "user")}
+                    defaultValue="user"
                     disabled={isLoading}
                   >
                     <SelectTrigger className="pl-10 bg-slate-950/60 border-slate-800 text-slate-100 focus:border-indigo-500 focus:ring-indigo-500">
                       <SelectValue placeholder="Select user role" />
                     </SelectTrigger>
                     <SelectContent className="bg-slate-900 border-slate-800 text-slate-200">
-                      <SelectItem value="seller">Seller (Order Placement & Catalog)</SelectItem>
+                      <SelectItem value="user">User (Order Placement & Catalog)</SelectItem>
                       <SelectItem value="admin">Administrator (Full Control)</SelectItem>
                     </SelectContent>
                   </Select>

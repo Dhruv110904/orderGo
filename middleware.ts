@@ -10,7 +10,7 @@ export default auth((req) => {
   const role = req.auth?.user?.role;
 
   const isAdminRoute = nextUrl.pathname.startsWith("/admin");
-  const isSellerRoute = nextUrl.pathname.startsWith("/seller");
+  const isUserRoute = nextUrl.pathname.startsWith("/user");
   const isAuthRoute = nextUrl.pathname.startsWith("/login");
 
   if (isAdminRoute) {
@@ -18,15 +18,15 @@ export default auth((req) => {
       return NextResponse.redirect(new URL("/login", nextUrl));
     }
     if (role !== "admin") {
-      return NextResponse.redirect(new URL("/seller/dashboard", nextUrl));
+      return NextResponse.redirect(new URL("/user/dashboard", nextUrl));
     }
   }
 
-  if (isSellerRoute) {
+  if (isUserRoute) {
     if (!isLoggedIn) {
       return NextResponse.redirect(new URL("/login", nextUrl));
     }
-    if (role !== "seller") {
+    if (role !== "user") {
       return NextResponse.redirect(new URL("/admin/dashboard", nextUrl));
     }
   }
@@ -36,7 +36,7 @@ export default auth((req) => {
       if (role === "admin") {
         return NextResponse.redirect(new URL("/admin/dashboard", nextUrl));
       } else {
-        return NextResponse.redirect(new URL("/seller/dashboard", nextUrl));
+        return NextResponse.redirect(new URL("/user/dashboard", nextUrl));
       }
     }
   }
@@ -45,5 +45,5 @@ export default auth((req) => {
 });
 
 export const config = {
-  matcher: ["/admin/:path*", "/seller/:path*", "/login"],
+  matcher: ["/admin/:path*", "/user/:path*", "/login"],
 };

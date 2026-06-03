@@ -15,7 +15,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Trash2, ShoppingCart, Loader2, ArrowRight, MessageSquare, ClipboardCheck, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 
-export default function SellerCartPage() {
+export default function UserCartPage() {
   const router = useRouter();
   const { items, removeItem, updateQuantity, updateUnit, clearCart, cartTotal } = useCart();
   const [notes, setNotes] = useState("");
@@ -85,12 +85,12 @@ export default function SellerCartPage() {
             </p>
           </CardContent>
           <CardFooter className="flex flex-col sm:flex-row gap-3 justify-center border-t border-slate-800/40 pt-6">
-            <Link href="/seller/orders" className="w-full sm:w-auto">
+            <Link href="/user/orders" className="w-full sm:w-auto">
               <Button variant="ghost" className="w-full text-slate-400 hover:text-white hover:bg-slate-800/50">
                 View Order History
               </Button>
             </Link>
-            <Link href="/seller/products" className="w-full sm:w-auto">
+            <Link href="/user/products" className="w-full sm:w-auto">
               <Button className="w-full bg-gradient-to-r from-indigo-600 to-emerald-600 hover:from-indigo-500 hover:to-emerald-500 text-white font-medium">
                 Continue Shopping
               </Button>
@@ -119,7 +119,7 @@ export default function SellerCartPage() {
             </CardDescription>
           </CardHeader>
           <CardFooter className="justify-center mt-4">
-            <Link href="/seller/products">
+            <Link href="/user/products">
               <Button className="bg-gradient-to-r from-indigo-600 to-emerald-600 hover:from-indigo-500 hover:to-emerald-500 text-white gap-2 font-medium">
                 <ArrowLeft className="h-4 w-4" />
                 Go to Catalog

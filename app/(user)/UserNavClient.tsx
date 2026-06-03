@@ -23,7 +23,7 @@ interface LinkItem {
   isCart?: boolean;
 }
 
-interface SellerNavClientProps {
+interface UserNavClientProps {
   links: LinkItem[];
   user: {
     name?: string | null;
@@ -33,7 +33,7 @@ interface SellerNavClientProps {
   isMobileHeader?: boolean;
 }
 
-export default function SellerNavClient({ links, user, isMobileHeader = false }: SellerNavClientProps) {
+export default function UserNavClient({ links, user, isMobileHeader = false }: UserNavClientProps) {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const { itemCount } = useCart();
@@ -86,7 +86,7 @@ export default function SellerNavClient({ links, user, isMobileHeader = false }:
           <User className="h-4.5 w-4.5" />
         </div>
         <div className="min-w-0 flex-1">
-          <p className="text-xs font-semibold text-white truncate">{user.name || "Seller"}</p>
+          <p className="text-xs font-semibold text-white truncate">{user.name || "User"}</p>
           <p className="text-[10px] text-slate-500 truncate">{user.email}</p>
         </div>
       </div>

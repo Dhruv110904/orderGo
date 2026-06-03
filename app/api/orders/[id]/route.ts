@@ -21,7 +21,7 @@ export async function GET(
   const { id } = params;
 
   try {
-    // Fetch Order details with Seller info
+    // Fetch Order details with User info
     const [order] = await db
       .select({
         id: orders.id,
@@ -31,8 +31,8 @@ export async function GET(
         createdAt: orders.createdAt,
         updatedAt: orders.updatedAt,
         userId: orders.userId,
-        sellerName: users.name,
-        sellerEmail: users.email,
+        userName: users.name,
+        userEmail: users.email,
       })
       .from(orders)
       .leftJoin(users, eq(orders.userId, users.id))
@@ -43,8 +43,8 @@ export async function GET(
       return NextResponse.json({ error: "Order not found" }, { status: 404 });
     }
 
-    // Role guard: Admin can see any order, Seller can only see their own
-    if (session.user.role === "seller" && order.userId !== session.user.id) {
+    // Role guard: Admin can see any order, User can only see their own
+    if (session.user.role === "user" && order.userId !== session.user.id) {
       return NextResponse.json({ error: "Forbidden: Access denied" }, { status: 403 });
     }
 

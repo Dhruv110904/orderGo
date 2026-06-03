@@ -21,7 +21,7 @@ export default async function AdminOrderDetailPage({ params }: AdminOrderDetailP
 
   const { id } = params;
 
-  // 1. Fetch order details joined with seller info
+  // 1. Fetch order details joined with user info
   const [order] = await db
     .select({
       id: orders.id,
@@ -31,8 +31,8 @@ export default async function AdminOrderDetailPage({ params }: AdminOrderDetailP
       createdAt: orders.createdAt,
       updatedAt: orders.updatedAt,
       userId: orders.userId,
-      sellerName: users.name,
-      sellerEmail: users.email,
+      userName: users.name,
+      userEmail: users.email,
     })
     .from(orders)
     .leftJoin(users, eq(orders.userId, users.id))

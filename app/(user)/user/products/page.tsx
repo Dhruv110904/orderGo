@@ -1,12 +1,12 @@
 import { db } from "@/lib/db";
 import { products } from "@/db/schema";
 import { eq, sql } from "drizzle-orm";
-import SellerProductsClient from "./SellerProductsClient";
+import UserProductsClient from "./UserProductsClient";
 
 export const revalidate = 0; // live catalog updates
 
-export default async function SellerProductsPage() {
-  // Sellers only browse active products
+export default async function UserProductsPage() {
+  // Users only browse active products
   const activeProducts = await db
     .select()
     .from(products)
@@ -36,7 +36,7 @@ export default async function SellerProductsPage() {
 
   return (
     <div className="space-y-6">
-      <SellerProductsClient initialProducts={activeProducts} categories={categories} />
+      <UserProductsClient initialProducts={activeProducts} categories={categories} />
     </div>
   );
 }

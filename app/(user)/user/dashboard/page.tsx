@@ -10,15 +10,15 @@ import { redirect } from "next/navigation";
 
 export const revalidate = 0; // live dashboard updates
 
-export default async function SellerDashboardPage() {
+export default async function UserDashboardPage() {
   const session = await auth();
-  if (!session || session.user.role !== "seller") {
+  if (!session || session.user.role !== "user") {
     redirect("/login");
   }
 
   const userId = session.user.id;
 
-  // Query seller specific stats
+  // Query user specific stats
   const [
     [totalOrdersResult],
     [pendingOrdersResult],
@@ -83,7 +83,7 @@ export default async function SellerDashboardPage() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold tracking-tight text-white">Welcome, {session.user.name || "Seller"}!</h1>
+        <h1 className="text-3xl font-bold tracking-tight text-white">Welcome, {session.user.name || "User"}!</h1>
         <p className="text-slate-400 text-sm mt-1">Here is a summary of your orders, quotations, and active sales.</p>
       </div>
 
@@ -117,7 +117,7 @@ export default async function SellerDashboardPage() {
             <CardDescription className="text-slate-400">Jump directly into order execution steps.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-3 pb-6 flex-1">
-            <Link href="/seller/products" className="flex items-center justify-between p-3 rounded-lg bg-slate-950/40 border border-slate-850 hover:border-slate-800 hover:bg-slate-950/70 transition-all group">
+            <Link href="/user/products" className="flex items-center justify-between p-3 rounded-lg bg-slate-950/40 border border-slate-850 hover:border-slate-800 hover:bg-slate-950/70 transition-all group">
               <div className="flex items-center gap-2.5">
                 <div className="p-1.5 rounded-md bg-indigo-500/10 text-indigo-400">
                   <ShoppingBag className="h-4 w-4" />
@@ -127,7 +127,7 @@ export default async function SellerDashboardPage() {
               <ArrowRight className="h-4 w-4 text-slate-500 group-hover:text-indigo-400 transition-colors" />
             </Link>
 
-            <Link href="/seller/cart" className="flex items-center justify-between p-3 rounded-lg bg-slate-950/40 border border-slate-850 hover:border-slate-800 hover:bg-slate-950/70 transition-all group">
+            <Link href="/user/cart" className="flex items-center justify-between p-3 rounded-lg bg-slate-950/40 border border-slate-850 hover:border-slate-800 hover:bg-slate-950/70 transition-all group">
               <div className="flex items-center gap-2.5">
                 <div className="p-1.5 rounded-md bg-emerald-500/10 text-emerald-400">
                   <ShoppingCart className="h-4 w-4" />
@@ -146,7 +146,7 @@ export default async function SellerDashboardPage() {
               <CardTitle className="text-lg font-semibold text-white">Your Recent Orders</CardTitle>
               <CardDescription className="text-slate-400">Status of your last 5 order requests</CardDescription>
             </div>
-            <Link href="/seller/orders" className="text-xs text-indigo-400 hover:text-indigo-300 flex items-center font-medium">
+            <Link href="/user/orders" className="text-xs text-indigo-400 hover:text-indigo-300 flex items-center font-medium">
               View History <ArrowRight className="ml-1 h-3 w-3" />
             </Link>
           </CardHeader>
@@ -159,7 +159,7 @@ export default async function SellerDashboardPage() {
                   <div key={order.id} className="flex items-center justify-between p-3 rounded-lg bg-slate-950/40 border border-slate-850 hover:border-slate-800 transition-colors">
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2">
-                        <Link href={`/seller/orders/${order.id}`} className="text-sm font-semibold text-indigo-400 hover:underline truncate">
+                        <Link href={`/user/orders/${order.id}`} className="text-sm font-semibold text-indigo-400 hover:underline truncate">
                           #{order.id.slice(0, 8)}
                         </Link>
                         <span className="text-[10px] text-slate-500">

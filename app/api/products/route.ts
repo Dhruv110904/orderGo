@@ -30,8 +30,8 @@ export async function GET(req: NextRequest) {
   try {
     const conditions = [];
 
-    // Filter by role: Sellers only see active products. Admins see all.
-    if (session.user.role === "seller") {
+    // Filter by role: Users only see active products. Admins see all.
+    if (session.user.role === "user") {
       conditions.push(eq(products.isActive, true));
     }
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { signIn } from "next-auth/react";
+import { signIn, getSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -53,10 +53,15 @@ export default function LoginPage() {
         toast.success("Welcome back!", {
           description: "Signing you into your dashboard...",
         });
-        
-        // Let middleware or route control handle redirect by refreshing/navigating
-        router.refresh();
-        router.push("/");
+
+        // Fetch updated session to get the user's role, then redirect to the right dashboard
+        const session = await getSession();
+        const role = session?.user?.role;
+        if (role === "admin") {
+          router.push("/admin/dashboard");
+        } else {
+          router.push("/user/dashboard");
+        }
       }
     } catch (error) {
       console.error("Login submission error:", error);
@@ -153,7 +158,7 @@ export default function LoginPage() {
                 <p className="text-xs text-slate-500">
                   Demo Credentials:<br />
                   Admin: <code className="text-slate-300">admin@aasa.com</code> / <code className="text-slate-300">Admin@123</code><br />
-                  Seller: <code className="text-slate-300">seller@aasa.com</code> / <code className="text-slate-300">Seller@123</code>
+                  User: <code className="text-slate-300">user@aasa.com</code> / <code className="text-slate-300">User@123</code>
                 </p>
               </div>
             </CardFooter>

@@ -154,7 +154,7 @@ export async function DELETE(
       return NextResponse.json(
         { 
           error: "Cannot delete product because it has associated order items.",
-          details: "Try turning off the product's 'Active' status to hide it from sellers instead."
+          details: "Try turning off the product's 'Active' status to hide it from users instead."
         },
         { status: 400 }
       );

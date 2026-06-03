@@ -31,7 +31,7 @@ export default async function AdminDashboardPage() {
         status: orders.status,
         totalAmount: orders.totalAmount,
         createdAt: orders.createdAt,
-        sellerName: users.name,
+        userName: users.name,
       })
       .from(orders)
       .leftJoin(users, eq(orders.userId, users.id))
@@ -84,7 +84,7 @@ export default async function AdminDashboardPage() {
     {
       title: "Total Orders",
       value: totalOrders,
-      description: "Placed by all sellers",
+      description: "Placed by all users",
       icon: ShoppingCart,
       color: "text-cyan-400 bg-cyan-500/10 border-cyan-500/20",
     },
@@ -128,7 +128,7 @@ export default async function AdminDashboardPage() {
           <CardHeader className="flex flex-row items-center justify-between pb-4 border-b border-slate-800/60">
             <div>
               <CardTitle className="text-lg font-semibold text-white">Recent Orders</CardTitle>
-              <CardDescription className="text-slate-400">Latest orders requested by sellers</CardDescription>
+              <CardDescription className="text-slate-400">Latest orders requested by users</CardDescription>
             </div>
             <Link href="/admin/orders" className="text-xs text-indigo-400 hover:text-indigo-300 flex items-center font-medium">
               View All <ArrowRight className="ml-1 h-3 w-3" />
@@ -146,7 +146,7 @@ export default async function AdminDashboardPage() {
                         <Link href={`/admin/orders/${order.id}`} className="text-sm font-semibold text-indigo-400 hover:underline truncate">
                           #{order.id.slice(0, 8)}
                         </Link>
-                        <span className="text-xs text-slate-400">by {order.sellerName}</span>
+                        <span className="text-xs text-slate-400">by {order.userName}</span>
                       </div>
                       <span className="text-[11px] text-slate-500">
                         {new Date(order.createdAt!).toLocaleDateString("en-IN", {

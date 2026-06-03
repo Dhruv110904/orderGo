@@ -9,7 +9,7 @@ async function main() {
     // 1. Seed Users
     console.log("Seeding users...");
     const adminPasswordHash = await bcrypt.hash("Admin@123", 10);
-    const sellerPasswordHash = await bcrypt.hash("Seller@123", 10);
+    const userPasswordHash = await bcrypt.hash("User@123", 10);
 
     const seededUsers = await db
       .insert(users)
@@ -21,10 +21,10 @@ async function main() {
           role: "admin",
         },
         {
-          name: "John Seller",
-          email: "seller@aasa.com",
-          passwordHash: sellerPasswordHash,
-          role: "seller",
+          name: "John User",
+          email: "user@aasa.com",
+          passwordHash: userPasswordHash,
+          role: "user",
         },
       ])
       .onConflictDoNothing({ target: users.email })

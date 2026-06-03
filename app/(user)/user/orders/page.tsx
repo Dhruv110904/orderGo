@@ -12,16 +12,16 @@ import { redirect } from "next/navigation";
 
 export const revalidate = 0; // live order updates
 
-export default async function SellerOrdersPage() {
+export default async function UserOrdersPage() {
   const session = await auth();
-  if (!session || session.user.role !== "seller") {
+  if (!session || session.user.role !== "user") {
     redirect("/login");
   }
 
   const userId = session.user.id;
 
-  // Fetch all orders placed by this seller
-  const sellerOrders = await db
+  // Fetch all orders placed by this user
+  const userOrders = await db
     .select()
     .from(orders)
     .where(eq(orders.userId, userId))
@@ -73,17 +73,17 @@ export default async function SellerOrdersPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {sellerOrders.length === 0 ? (
+              {userOrders.length === 0 ? (
                 <TableRow className="hover:bg-transparent">
                   <TableCell colSpan={6} className="text-center py-12 text-slate-500">
                     No orders placed yet.
                   </TableCell>
                 </TableRow>
               ) : (
-                sellerOrders.map((order) => (
+                userOrders.map((order) => (
                   <TableRow key={order.id} className="border-b border-slate-850/80 hover:bg-slate-900/20 text-slate-300 transition-colors">
                     <TableCell className="font-mono text-xs font-semibold text-indigo-400">
-                      <Link href={`/seller/orders/${order.id}`} className="hover:underline">
+                      <Link href={`/user/orders/${order.id}`} className="hover:underline">
                         #{order.id.slice(0, 8)}
                       </Link>
                     </TableCell>
@@ -120,7 +120,7 @@ export default async function SellerOrdersPage() {
                       </span>
                     </TableCell>
                     <TableCell className="text-right">
-                      <Link href={`/seller/orders/${order.id}`}>
+                      <Link href={`/user/orders/${order.id}`}>
                         <Button variant="ghost" size="sm" className="text-indigo-400 hover:text-indigo-300 hover:bg-indigo-950/20 gap-1.5 py-1">
                           <Eye className="h-4 w-4" />
                           View

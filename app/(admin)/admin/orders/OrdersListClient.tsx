@@ -16,8 +16,8 @@ interface Order {
   notes: string | null;
   createdAt: Date | null;
   updatedAt: Date | null;
-  sellerName: string | null;
-  sellerEmail: string | null;
+  userName: string | null;
+  userEmail: string | null;
 }
 
 interface OrdersListClientProps {
@@ -40,8 +40,8 @@ export default function OrdersListClient({ initialOrders }: OrdersListClientProp
   const filteredOrders = ordersList.filter((order) => {
     const matchesSearch =
       order.id.toLowerCase().includes(search.toLowerCase()) ||
-      (order.sellerName || "").toLowerCase().includes(search.toLowerCase()) ||
-      (order.sellerEmail || "").toLowerCase().includes(search.toLowerCase());
+      (order.userName || "").toLowerCase().includes(search.toLowerCase()) ||
+      (order.userEmail || "").toLowerCase().includes(search.toLowerCase());
 
     const matchesStatus = activeTab === "all" || order.status === activeTab;
 
@@ -67,7 +67,7 @@ export default function OrdersListClient({ initialOrders }: OrdersListClientProp
       {/* Header */}
       <div>
         <h1 className="text-3xl font-bold tracking-tight text-white">Order Management</h1>
-        <p className="text-slate-400 text-sm mt-1">Review, approve, reject, or fulfill orders submitted by sellers.</p>
+        <p className="text-slate-400 text-sm mt-1">Review, approve, reject, or fulfill orders submitted by users.</p>
       </div>
 
       {/* Tabs */}
@@ -93,7 +93,7 @@ export default function OrdersListClient({ initialOrders }: OrdersListClientProp
         <div className="relative flex-1">
           <Search className="absolute left-3 top-3 h-4 w-4 text-slate-500" />
           <Input
-            placeholder="Search by Order ID, Seller Name or Email..."
+            placeholder="Search by Order ID, User Name or Email..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="pl-9 bg-slate-950/60 border-slate-850 text-slate-200 placeholder:text-slate-650 focus:border-indigo-500 focus:ring-indigo-500"
@@ -114,7 +114,7 @@ export default function OrdersListClient({ initialOrders }: OrdersListClientProp
           <TableHeader className="bg-slate-900/60 border-b border-slate-800 text-slate-400">
             <TableRow className="border-b border-slate-850 hover:bg-transparent">
               <TableHead className="w-1/6">Order ID</TableHead>
-              <TableHead className="w-1/4">Seller Profile</TableHead>
+              <TableHead className="w-1/4">User Profile</TableHead>
               <TableHead>Date Placed</TableHead>
               <TableHead>Total (INR)</TableHead>
               <TableHead className="text-center">Status</TableHead>
@@ -138,8 +138,8 @@ export default function OrdersListClient({ initialOrders }: OrdersListClientProp
                   </TableCell>
                   <TableCell>
                     <div className="flex flex-col">
-                      <span className="font-semibold text-white">{order.sellerName || "Unknown Seller"}</span>
-                      <span className="text-[10px] text-slate-500">{order.sellerEmail}</span>
+                      <span className="font-semibold text-white">{order.userName || "Unknown User"}</span>
+                      <span className="text-[10px] text-slate-500">{order.userEmail}</span>
                     </div>
                   </TableCell>
                   <TableCell className="text-sm">

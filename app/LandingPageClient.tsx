@@ -35,14 +35,14 @@ const features = [
     category: "auth",
     icon: Layers,
     color: "cyan",
-    description: "NextAuth.js v5 route guarding executed on the edge runtime. Instantly routes administrative tasks, seller portal layouts, and login prompts securely based on encoded JWT claims."
+    description: "NextAuth.js v5 route guarding executed on the edge runtime. Instantly routes administrative tasks, user portal layouts, and login prompts securely based on encoded JWT claims."
   },
   {
     title: "Live Unit Conversion Pipeline",
     category: "math",
     icon: Calculator,
     color: "pink",
-    description: "Stores weight in grams and volume in milliliters, but allows sellers to buy in kilograms or liters. Pre-commit hooks convert orders to the database base unit seamlessly."
+    description: "Stores weight in grams and volume in milliliters, but allows users to buy in kilograms or liters. Pre-commit hooks convert orders to the database base unit seamlessly."
   },
   {
     title: "Real-time Stock Audits",
@@ -114,8 +114,8 @@ export default function LandingPageClient({ session }: LandingPageClientProps) {
     setIsConcurrencySimulating(true);
     setConcurrencyStep(1);
     setConcurrencyLog([
-      "[t=0ms] Seller A submits order for 10 kg Basmati Rice",
-      "[t=2ms] Seller B submits order for 5 kg Basmati Rice simultaneously"
+      "[t=0ms] User A submits order for 10 kg Basmati Rice",
+      "[t=2ms] User B submits order for 5 kg Basmati Rice simultaneously"
     ]);
     
     setTimeout(() => {
@@ -202,7 +202,7 @@ export default function LandingPageClient({ session }: LandingPageClientProps) {
 
         <div>
           {isLoggedIn ? (
-            <Link href={role === "admin" ? "/admin/dashboard" : "/seller/dashboard"}>
+            <Link href={role === "admin" ? "/admin/dashboard" : "/user/dashboard"}>
               <Button className="bg-slate-900 hover:bg-slate-850 text-white border border-slate-800 text-xs font-semibold px-4 h-9">
                 Go to Dashboard
                 <ArrowRight className="ml-2 h-3.5 w-3.5" />
@@ -238,7 +238,7 @@ export default function LandingPageClient({ session }: LandingPageClientProps) {
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
           {isLoggedIn ? (
-            <Link href={role === "admin" ? "/admin/dashboard" : "/seller/dashboard"}>
+            <Link href={role === "admin" ? "/admin/dashboard" : "/user/dashboard"}>
               <Button className="w-full sm:w-auto bg-gradient-to-r from-indigo-600 to-emerald-600 hover:from-indigo-500 hover:to-emerald-500 text-white font-bold px-8 py-6 rounded-xl shadow-xl shadow-indigo-600/10">
                 Enter System Portal
               </Button>
@@ -274,7 +274,7 @@ export default function LandingPageClient({ session }: LandingPageClientProps) {
                   <div className="h-3 w-3 rounded-full bg-rose-500"></div>
                   <div className="h-3 w-3 rounded-full bg-amber-500"></div>
                   <div className="h-3 w-3 rounded-full bg-emerald-500"></div>
-                  <span className="text-[10px] text-slate-500 font-mono ml-2">secure.ordergo.app/seller/products</span>
+                  <span className="text-[10px] text-slate-500 font-mono ml-2">secure.ordergo.app/user/products</span>
                 </div>
                 <span className="px-2 py-0.5 rounded text-[9px] bg-emerald-950/50 border border-emerald-800/30 text-emerald-350 font-bold uppercase tracking-wider">
                   Live Demo Connected
@@ -588,7 +588,7 @@ export default function LandingPageClient({ session }: LandingPageClientProps) {
                   </div>
                   <h3 className="text-md font-bold text-white">Stock Lock Simulator</h3>
                   <p className="text-[11px] text-slate-400 leading-relaxed">
-                    Seller A and Seller B check out the last 10 kg of stock at the same millisecond.
+                    User A and User B check out the last 10 kg of stock at the same millisecond.
                   </p>
                 </div>
 
@@ -684,7 +684,7 @@ export default function LandingPageClient({ session }: LandingPageClientProps) {
           <div className="text-center space-y-3">
             <h2 className="text-3xl font-bold tracking-tight text-white">Instant Sandbox Access</h2>
             <p className="text-slate-400 text-sm max-w-xl mx-auto">
-              Test out both admin controls and seller flows immediately. Click any credential to copy.
+              Test out both admin controls and user flows immediately. Click any credential to copy.
             </p>
           </div>
 
@@ -743,7 +743,7 @@ export default function LandingPageClient({ session }: LandingPageClientProps) {
               </div>
             </Card>
 
-            {/* Seller Keycard */}
+            {/* User Keycard */}
             <Card 
               onMouseMove={handleMouseMove}
               className="relative border-slate-850 bg-slate-900/25 text-slate-100 group overflow-hidden transition-all duration-300 p-6 flex flex-col justify-between space-y-4 hover:border-emerald-500/20"
@@ -752,7 +752,7 @@ export default function LandingPageClient({ session }: LandingPageClientProps) {
               
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-[10px] text-emerald-400 font-mono tracking-widest uppercase font-bold">Role: Registered Seller</span>
+                  <span className="text-[10px] text-emerald-400 font-mono tracking-widest uppercase font-bold">Role: Registered User</span>
                   <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
                 </div>
                 <div className="flex items-center gap-3">
@@ -770,28 +770,28 @@ export default function LandingPageClient({ session }: LandingPageClientProps) {
                 <div className="flex justify-between items-center p-2 rounded bg-slate-950/60 border border-slate-900">
                   <div className="overflow-hidden mr-2">
                     <span className="text-[9px] text-slate-500 block uppercase font-bold">Email Address</span>
-                    <span className="text-slate-300 text-[10px] truncate block">seller@aasa.com</span>
+                    <span className="text-slate-300 text-[10px] truncate block">user@aasa.com</span>
                   </div>
                   <button 
-                    onClick={() => handleCopy("seller@aasa.com", "Seller Email")}
+                    onClick={() => handleCopy("user@aasa.com", "User Email")}
                     className="p-1.5 rounded hover:bg-slate-900 text-slate-400 hover:text-white transition-colors flex-shrink-0"
                     title="Copy Email"
                   >
-                    {copiedText === "Seller Email" ? <Check className="h-3.5 w-3.5 text-emerald-450" /> : <Copy className="h-3.5 w-3.5" />}
+                    {copiedText === "User Email" ? <Check className="h-3.5 w-3.5 text-emerald-450" /> : <Copy className="h-3.5 w-3.5" />}
                   </button>
                 </div>
 
                 <div className="flex justify-between items-center p-2 rounded bg-slate-950/60 border border-slate-900">
                   <div className="overflow-hidden mr-2">
                     <span className="text-[9px] text-slate-500 block uppercase font-bold">Secret Key</span>
-                    <span className="text-slate-300 text-[10px] truncate block">Seller@123</span>
+                    <span className="text-slate-300 text-[10px] truncate block">User@123</span>
                   </div>
                   <button 
-                    onClick={() => handleCopy("Seller@123", "Seller Password")}
+                    onClick={() => handleCopy("User@123", "User Password")}
                     className="p-1.5 rounded hover:bg-slate-900 text-slate-400 hover:text-white transition-colors flex-shrink-0"
                     title="Copy Password"
                   >
-                    {copiedText === "Seller Password" ? <Check className="h-3.5 w-3.5 text-emerald-450" /> : <Copy className="h-3.5 w-3.5" />}
+                    {copiedText === "User Password" ? <Check className="h-3.5 w-3.5 text-emerald-450" /> : <Copy className="h-3.5 w-3.5" />}
                   </button>
                 </div>
               </div>

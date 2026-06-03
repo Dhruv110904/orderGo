@@ -22,12 +22,12 @@ interface Product {
   isActive: boolean | null;
 }
 
-interface SellerProductsClientProps {
+interface UserProductsClientProps {
   initialProducts: Product[];
   categories: string[];
 }
 
-export default function SellerProductsClient({ initialProducts, categories }: SellerProductsClientProps) {
+export default function UserProductsClient({ initialProducts, categories }: UserProductsClientProps) {
   const { addItem } = useCart();
   const [search, setSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
@@ -186,7 +186,7 @@ export default function SellerProductsClient({ initialProducts, categories }: Se
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {filteredProducts.map((product) => {
             const compatibleUnits = getCompatibleUnits(product.baseUnit);
-            // Default to larger units (kg, L) if available for better seller display
+            // Default to larger units (kg, L) if available for better user display
             const defaultUnit = compatibleUnits[1] || product.baseUnit;
             
             const selection = getSelection(product.id, defaultUnit);

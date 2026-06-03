@@ -10,7 +10,7 @@ const createUserSchema = z.object({
   name: z.string().min(1, "Name is required").max(255),
   email: z.string().email("Invalid email address"),
   password: z.string().min(6, "Password must be at least 6 characters"),
-  role: z.enum(["admin", "seller"]).default("seller"),
+  role: z.enum(["admin", "user"]).default("user"),
 });
 
 export async function GET(req: NextRequest) {
@@ -24,7 +24,7 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    // List all users except current admin to prevent editing oneself or just return all sellers
+    // List all users except current admin to prevent editing oneself or just return all users
     const allUsers = await db
       .select({
         id: users.id,
