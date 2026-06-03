@@ -1,7 +1,6 @@
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { LayoutDashboard, Package, ShoppingCart, Users, LogOut, ShieldAlert } from "lucide-react";
 import AdminNavClient from "./AdminNavClient";
 
 export default async function AdminLayout({
@@ -17,10 +16,10 @@ export default async function AdminLayout({
   }
 
   const links = [
-    { name: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
-    { name: "Products", href: "/admin/products", icon: Package },
-    { name: "Orders", href: "/admin/orders", icon: ShoppingCart },
-    { name: "Sellers", href: "/admin/users", icon: Users },
+    { name: "Dashboard", href: "/admin/dashboard", icon: "dashboard" },
+    { name: "Products", href: "/admin/products", icon: "products" },
+    { name: "Orders", href: "/admin/orders", icon: "orders" },
+    { name: "Sellers", href: "/admin/users", icon: "users" },
   ];
 
   return (

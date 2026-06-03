@@ -5,13 +5,20 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
 import { cn } from "@/lib/utils";
-import { LogOut, Menu, X, User } from "lucide-react";
+import { LogOut, Menu, X, User, LayoutDashboard, Package, ShoppingCart, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
+
+const ICON_MAP: Record<string, any> = {
+  dashboard: LayoutDashboard,
+  products: Package,
+  orders: ShoppingCart,
+  users: Users,
+};
 
 interface LinkItem {
   name: string;
   href: string;
-  icon: any;
+  icon: string;
 }
 
 interface AdminNavClientProps {
@@ -35,7 +42,7 @@ export default function AdminNavClient({ links, user, isMobileHeader = false }: 
   const navLinks = (
     <nav className="flex-1 px-4 py-4 space-y-1.5 overflow-y-auto">
       {links.map((link) => {
-        const Icon = link.icon;
+        const Icon = ICON_MAP[link.icon] || Package;
         const isActive = pathname === link.href || pathname.startsWith(link.href + "/");
         return (
           <Link

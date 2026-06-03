@@ -1,7 +1,6 @@
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { CartProvider } from "@/context/CartContext";
-import { LayoutDashboard, ShoppingBag, ShoppingCart, History, LogOut } from "lucide-react";
 import SellerNavClient from "./SellerNavClient";
 
 export default async function SellerLayout({
@@ -17,10 +16,10 @@ export default async function SellerLayout({
   }
 
   const links = [
-    { name: "Dashboard", href: "/seller/dashboard", icon: LayoutDashboard },
-    { name: "Product Catalog", href: "/seller/products", icon: ShoppingBag },
-    { name: "Shopping Cart", href: "/seller/cart", icon: ShoppingCart, isCart: true },
-    { name: "Order History", href: "/seller/orders", icon: History },
+    { name: "Dashboard", href: "/seller/dashboard", icon: "dashboard" },
+    { name: "Product Catalog", href: "/seller/products", icon: "catalog" },
+    { name: "Shopping Cart", href: "/seller/cart", icon: "cart", isCart: true },
+    { name: "Order History", href: "/seller/orders", icon: "orders" },
   ];
 
   return (

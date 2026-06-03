@@ -1,10 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
-import { Geist } from "next/font/google";
-import { cn } from "@/lib/utils";
-
-const geist = Geist({subsets:['latin'],variable:'--font-sans'});
+import { Toaster } from "sonner";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -17,8 +14,6 @@ const geistMono = localFont({
   weight: "100 900",
 });
 
-import { Toaster } from "sonner";
-
 export const metadata: Metadata = {
   title: "orderGo | Inventory and Order Management",
   description: "Sleek, high-precision inventory and order management system.",
@@ -30,9 +25,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={cn("font-sans", geist.variable, "dark")}>
+    <html lang="en" className="dark">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-slate-950 text-slate-100`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-slate-950 text-slate-100 font-sans`}
       >
         {children}
         <Toaster theme="dark" position="top-right" closeButton richColors />
