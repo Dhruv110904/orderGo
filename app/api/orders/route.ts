@@ -2,12 +2,14 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { db } from "@/lib/db";
 import { orders, orderItems, products, users } from "@/db/schema";
-import { eq, and, desc } from "drizzle-orm";
+import { eq, desc } from "drizzle-orm";
 import { toBaseUnit, pricePerOrderedUnit } from "@/lib/units";
 import { z } from "zod";
 
 const createOrderSchema = z.object({
   notes: z.string().optional().nullable(),
+  deliveryAddress: z.string().min(10, "Please provide a full delivery address (min 10 characters)"),
+  paymentMethod: z.literal("cod").default("cod"),
   items: z.array(
     z.object({
       productId: z.string().uuid("Invalid product ID"),
@@ -30,13 +32,14 @@ export async function GET(req: NextRequest) {
     let orderQuery;
 
     if (session.user.role === "admin") {
-      // Admins see all orders
       orderQuery = db
         .select({
           id: orders.id,
           status: orders.status,
           totalAmount: orders.totalAmount,
           notes: orders.notes,
+          deliveryAddress: orders.deliveryAddress,
+          paymentMethod: orders.paymentMethod,
           createdAt: orders.createdAt,
           updatedAt: orders.updatedAt,
           userName: users.name,
@@ -45,13 +48,14 @@ export async function GET(req: NextRequest) {
         .from(orders)
         .leftJoin(users, eq(orders.userId, users.id));
     } else {
-      // Users see only their own orders
       orderQuery = db
         .select({
           id: orders.id,
           status: orders.status,
           totalAmount: orders.totalAmount,
           notes: orders.notes,
+          deliveryAddress: orders.deliveryAddress,
+          paymentMethod: orders.paymentMethod,
           createdAt: orders.createdAt,
           updatedAt: orders.updatedAt,
           userName: users.name,
@@ -60,12 +64,6 @@ export async function GET(req: NextRequest) {
         .from(orders)
         .leftJoin(users, eq(orders.userId, users.id))
         .where(eq(orders.userId, session.user.id));
-    }
-
-    // Apply status filter if provided
-    if (status) {
-      // Drizzle doesn't support where on join directly without nesting or where in query
-      // Let's filter the results or modify the query
     }
 
     const fetchedOrders = await orderQuery.orderBy(desc(orders.createdAt));
@@ -101,80 +99,75 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { notes, items } = result.data;
+    const { notes, deliveryAddress, paymentMethod, items } = result.data;
 
-    // We run the order placement in a transaction
-    const newOrder = await db.transaction(async (tx) => {
-      let orderTotal = 0;
-      const orderItemInserts: any[] = [];
+    // --- Step 1: Validate all products and compute totals ---
+    let orderTotal = 0;
+    const orderItemInserts: any[] = [];
 
-      for (const item of items) {
-        // Fetch product
-        const [product] = await tx
-          .select()
-          .from(products)
-          .where(eq(products.id, item.productId))
-          .limit(1);
+    for (const item of items) {
+      const [product] = await db
+        .select()
+        .from(products)
+        .where(eq(products.id, item.productId))
+        .limit(1);
 
-        if (!product) {
-          throw new Error(`Product with ID ${item.productId} not found.`);
-        }
-
-        if (!product.isActive) {
-          throw new Error(`Product "${product.name}" is no longer active.`);
-        }
-
-        const baseQty = toBaseUnit(item.orderedQuantity, item.orderedUnit);
-        const productStock = parseFloat(product.stockQuantity);
-
-        // User-side soft warning check:
-        // We can let order creation go through or block it. Let's block if item has absolutely no stock,
-        // but let's allow it as "Quotation" if stock is insufficient but positive.
-        // To be strict, we'll allow pending orders but let the admin do the hard check at confirmation.
-        // However, if the user requests more than available, let's log/allow but show warnings in UI.
-
-        const basePrice = parseFloat(product.basePricePerUnit);
-        const orderedPrice = pricePerOrderedUnit(basePrice, item.orderedUnit);
-        const lineTotal = parseFloat((item.orderedQuantity * orderedPrice).toFixed(2));
-
-        orderTotal += lineTotal;
-
-        orderItemInserts.push({
-          productId: item.productId,
-          orderedUnit: item.orderedUnit,
-          orderedQuantity: item.orderedQuantity.toString(),
-          baseQuantity: baseQty.toString(),
-          unitPriceInOrderedUnit: orderedPrice.toString(),
-          lineTotal: lineTotal.toString(),
-        });
+      if (!product) {
+        return NextResponse.json(
+          { error: `Product with ID ${item.productId} not found.` },
+          { status: 400 }
+        );
       }
 
-      // Insert Order
-      const [order] = await tx
-        .insert(orders)
-        .values({
-          userId: session.user.id,
-          status: "pending",
-          totalAmount: orderTotal.toFixed(2),
-          notes,
-        })
-        .returning();
-
-      // Insert Order Items
-      for (const orderItem of orderItemInserts) {
-        await tx.insert(orderItems).values({
-          orderId: order.id,
-          productId: orderItem.productId,
-          orderedUnit: orderItem.orderedUnit,
-          orderedQuantity: orderItem.orderedQuantity,
-          baseQuantity: orderItem.baseQuantity,
-          unitPriceInOrderedUnit: orderItem.unitPriceInOrderedUnit,
-          lineTotal: orderItem.lineTotal,
-        });
+      if (!product.isActive) {
+        return NextResponse.json(
+          { error: `Product "${product.name}" is no longer active and cannot be ordered.` },
+          { status: 400 }
+        );
       }
 
-      return order;
-    });
+      const baseQty = toBaseUnit(item.orderedQuantity, item.orderedUnit);
+      const basePrice = parseFloat(product.basePricePerUnit);
+      const orderedPrice = pricePerOrderedUnit(basePrice, item.orderedUnit);
+      const lineTotal = parseFloat((item.orderedQuantity * orderedPrice).toFixed(2));
+
+      orderTotal += lineTotal;
+
+      orderItemInserts.push({
+        productId: item.productId,
+        orderedUnit: item.orderedUnit,
+        orderedQuantity: item.orderedQuantity.toString(),
+        baseQuantity: baseQty.toString(),
+        unitPriceInOrderedUnit: orderedPrice.toString(),
+        lineTotal: lineTotal.toString(),
+      });
+    }
+
+    // --- Step 2: Insert the order ---
+    const [newOrder] = await db
+      .insert(orders)
+      .values({
+        userId: session.user.id,
+        status: "pending",
+        totalAmount: orderTotal.toFixed(2),
+        notes,
+        deliveryAddress,
+        paymentMethod,
+      })
+      .returning();
+
+    // --- Step 3: Insert order items ---
+    for (const orderItem of orderItemInserts) {
+      await db.insert(orderItems).values({
+        orderId: newOrder.id,
+        productId: orderItem.productId,
+        orderedUnit: orderItem.orderedUnit,
+        orderedQuantity: orderItem.orderedQuantity,
+        baseQuantity: orderItem.baseQuantity,
+        unitPriceInOrderedUnit: orderItem.unitPriceInOrderedUnit,
+        lineTotal: orderItem.lineTotal,
+      });
+    }
 
     return NextResponse.json(newOrder, { status: 201 });
   } catch (error: any) {

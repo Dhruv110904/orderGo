@@ -34,11 +34,14 @@ export const orders = pgTable("orders", {
   status: varchar("status", { length: 30 }).default("pending").notNull(),
   totalAmount: numeric("total_amount", { precision: 20, scale: 2 }).notNull(),
   notes: text("notes"),
+  deliveryAddress: text("delivery_address"),
+  paymentMethod: varchar("payment_method", { length: 30 }).default("cod").notNull(),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
 }, (table) => {
   return {
     statusCheck: check("status_check", sql`${table.status} IN ('pending', 'confirmed', 'rejected', 'fulfilled')`),
+    paymentMethodCheck: check("payment_method_check", sql`${table.paymentMethod} IN ('cod')`),
   };
 });
 

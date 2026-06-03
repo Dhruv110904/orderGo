@@ -28,6 +28,8 @@ export default async function AdminOrderDetailPage({ params }: AdminOrderDetailP
       status: orders.status,
       totalAmount: orders.totalAmount,
       notes: orders.notes,
+      deliveryAddress: orders.deliveryAddress,
+      paymentMethod: orders.paymentMethod,
       createdAt: orders.createdAt,
       updatedAt: orders.updatedAt,
       userId: orders.userId,

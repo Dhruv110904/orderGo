@@ -9,7 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { formatCurrency } from "@/lib/units";
-import { ArrowLeft, Clock, CheckCircle, XCircle, ChevronRight, MessageSquare, AlertCircle, Loader2 } from "lucide-react";
+import { ArrowLeft, Clock, CheckCircle, XCircle, ChevronRight, MessageSquare, AlertCircle, Loader2, MapPin, Banknote } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface OrderItem {
@@ -31,6 +31,8 @@ interface Order {
   status: string;
   totalAmount: string;
   notes: string | null;
+  deliveryAddress: string | null;
+  paymentMethod: string | null;
   createdAt: Date | null;
   updatedAt: Date | null;
   userId: string | null;
@@ -135,27 +137,51 @@ export default function OrderDetailAdminClient({ order, items }: OrderDetailAdmi
                 Submitted by {order.userName} ({order.userEmail})
               </CardDescription>
             </CardHeader>
-            <CardContent className="pt-6 grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
-              <div className="space-y-1">
-                <span className="text-slate-550 block text-xs">Date Submitted</span>
-                <span className="font-semibold text-slate-200">
-                  {order.createdAt ? new Date(order.createdAt).toLocaleString("en-IN") : "-"}
-                </span>
+            <CardContent className="pt-6 space-y-4 text-sm">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <span className="text-slate-500 block text-xs">Date Submitted</span>
+                  <span className="font-semibold text-slate-200">
+                    {order.createdAt ? new Date(order.createdAt).toLocaleString("en-IN") : "-"}
+                  </span>
+                </div>
+                <div className="space-y-1">
+                  <span className="text-slate-500 block text-xs">Last Updated</span>
+                  <span className="font-semibold text-slate-200">
+                    {order.updatedAt ? new Date(order.updatedAt).toLocaleString("en-IN") : "-"}
+                  </span>
+                </div>
+                <div className="space-y-1">
+                  <span className="text-slate-500 block text-xs">User ID</span>
+                  <span className="font-mono text-xs text-slate-400">{order.userId}</span>
+                </div>
+                <div className="space-y-1">
+                  <span className="text-slate-500 block text-xs">Order Reference</span>
+                  <span className="font-mono text-xs text-slate-400">{order.id}</span>
+                </div>
               </div>
-              <div className="space-y-1">
-                <span className="text-slate-550 block text-xs">Last Updated</span>
-                <span className="font-semibold text-slate-200">
-                  {order.updatedAt ? new Date(order.updatedAt).toLocaleString("en-IN") : "-"}
-                </span>
+
+              {/* Payment Method */}
+              <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-amber-500/10 border border-amber-500/20">
+                <Banknote className="h-5 w-5 text-amber-400 flex-shrink-0" />
+                <div>
+                  <p className="text-xs font-bold text-amber-300 uppercase tracking-wide">Payment Method</p>
+                  <p className="text-sm font-semibold text-white mt-0.5">
+                    {order.paymentMethod === "cod" ? "Cash on Delivery (COD)" : order.paymentMethod ?? "-"}
+                  </p>
+                </div>
               </div>
-              <div className="space-y-1">
-                <span className="text-slate-550 block text-xs">User ID</span>
-                <span className="font-mono text-xs text-slate-350">{order.userId}</span>
-              </div>
-              <div className="space-y-1">
-                <span className="text-slate-550 block text-xs">Order reference</span>
-                <span className="font-mono text-xs text-slate-350">{order.id}</span>
-              </div>
+
+              {/* Delivery Address */}
+              {order.deliveryAddress && (
+                <div className="flex items-start gap-3 px-4 py-3 rounded-xl bg-indigo-500/10 border border-indigo-500/20">
+                  <MapPin className="h-5 w-5 text-indigo-400 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-xs font-bold text-indigo-300 uppercase tracking-wide">Delivery Address</p>
+                    <p className="text-sm text-slate-200 mt-1 leading-relaxed whitespace-pre-line">{order.deliveryAddress}</p>
+                  </div>
+                </div>
+              )}
             </CardContent>
           </Card>
 
@@ -253,7 +279,7 @@ export default function OrderDetailAdminClient({ order, items }: OrderDetailAdmi
                 Order Status: <span className="uppercase tracking-wider">{status}</span>
               </CardTitle>
               <CardDescription className="text-slate-400">
-                Change status to trigger transaction safety and adjust warehouse stocks.
+                Change status to validate and adjust warehouse stocks.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
