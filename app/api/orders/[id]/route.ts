@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { db } from "@/lib/db";
 import { orders, orderItems, products, users } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { z } from "zod";
 
 const updateStatusSchema = z.object({
@@ -21,13 +21,14 @@ export async function GET(
   const { id } = params;
 
   try {
-    // Fetch Order details with User info
     const [order] = await db
       .select({
         id: orders.id,
         status: orders.status,
         totalAmount: orders.totalAmount,
         notes: orders.notes,
+        deliveryAddress: orders.deliveryAddress,
+        paymentMethod: orders.paymentMethod,
         createdAt: orders.createdAt,
         updatedAt: orders.updatedAt,
         userId: orders.userId,
@@ -43,12 +44,11 @@ export async function GET(
       return NextResponse.json({ error: "Order not found" }, { status: 404 });
     }
 
-    // Role guard: Admin can see any order, User can only see their own
+    // Role guard: admin sees any order, user only sees their own
     if (session.user.role === "user" && order.userId !== session.user.id) {
       return NextResponse.json({ error: "Forbidden: Access denied" }, { status: 403 });
     }
 
-    // Fetch order items joined with products details
     const items = await db
       .select({
         id: orderItems.id,
@@ -105,104 +105,101 @@ export async function PATCH(
 
     const { status: newStatus } = result.data;
 
-    // Run the status update and inventory adjustment inside a transaction
-    const updatedOrder = await db.transaction(async (tx) => {
-      // 1. Fetch current order
-      const [order] = await tx
-        .select()
-        .from(orders)
-        .where(eq(orders.id, id))
-        .limit(1);
+    // --- Step 1: Fetch current order ---
+    const [order] = await db
+      .select()
+      .from(orders)
+      .where(eq(orders.id, id))
+      .limit(1);
 
-      if (!order) {
-        throw new Error("Order not found");
-      }
+    if (!order) {
+      return NextResponse.json({ error: "Order not found" }, { status: 404 });
+    }
 
-      const oldStatus = order.status;
-      if (oldStatus === newStatus) {
-        return order;
-      }
+    const oldStatus = order.status;
 
-      // Fetch order items to check product stock
-      const items = await tx
-        .select()
-        .from(orderItems)
-        .where(eq(orderItems.orderId, id));
+    // No-op if the status hasn't changed
+    if (oldStatus === newStatus) {
+      return NextResponse.json(order);
+    }
 
-      const wasDeducted = oldStatus === "confirmed" || oldStatus === "fulfilled";
-      const isDeductedNow = newStatus === "confirmed" || newStatus === "fulfilled";
+    // --- Step 2: Fetch order items ---
+    const items = await db
+      .select()
+      .from(orderItems)
+      .where(eq(orderItems.orderId, id));
 
-      // 2. Perform Stock Adjustments
-      if (!wasDeducted && isDeductedNow) {
-        // We are confirming the order. Deduct stock.
-        for (const item of items) {
-          if (!item.productId) continue;
+    const wasDeducted = oldStatus === "confirmed" || oldStatus === "fulfilled";
+    const isDeductedNow = newStatus === "confirmed" || newStatus === "fulfilled";
 
-          // Fetch product
-          const [product] = await tx
-            .select()
-            .from(products)
-            .where(eq(products.id, item.productId))
-            .limit(1);
+    // --- Step 3: Stock deduction (pending → confirmed/fulfilled) ---
+    if (!wasDeducted && isDeductedNow) {
+      for (const item of items) {
+        if (!item.productId) continue;
 
-          if (!product) {
-            throw new Error(`Product not found for item: ${item.id}`);
-          }
+        const [product] = await db
+          .select()
+          .from(products)
+          .where(eq(products.id, item.productId))
+          .limit(1);
 
-          const stock = parseFloat(product.stockQuantity);
-          const required = parseFloat(item.baseQuantity);
-
-          if (stock < required) {
-            throw new Error(
-              `Insufficient stock for "${product.name}". Available: ${stock} ${product.baseUnit}, Required: ${required} ${product.baseUnit}.`
-            );
-          }
-
-          // Deduct stock
-          const newStock = stock - required;
-          await tx
-            .update(products)
-            .set({ stockQuantity: newStock.toFixed(6) })
-            .where(eq(products.id, item.productId));
+        if (!product) {
+          return NextResponse.json(
+            { error: `Product not found for order item ${item.id}` },
+            { status: 400 }
+          );
         }
-      } else if (wasDeducted && !isDeductedNow) {
-        // We are rejecting or returning a confirmed order. Restore stock.
-        for (const item of items) {
-          if (!item.productId) continue;
 
-          // Fetch product
-          const [product] = await tx
-            .select()
-            .from(products)
-            .where(eq(products.id, item.productId))
-            .limit(1);
+        const stock = parseFloat(product.stockQuantity);
+        const required = parseFloat(item.baseQuantity);
 
-          if (!product) continue;
-
-          const stock = parseFloat(product.stockQuantity);
-          const restored = parseFloat(item.baseQuantity);
-
-          // Restore stock
-          const newStock = stock + restored;
-          await tx
-            .update(products)
-            .set({ stockQuantity: newStock.toFixed(6) })
-            .where(eq(products.id, item.productId));
+        if (stock < required) {
+          return NextResponse.json(
+            {
+              error: `Insufficient stock for "${product.name}". Available: ${stock} ${product.baseUnit}, Required: ${required} ${product.baseUnit}.`,
+            },
+            { status: 400 }
+          );
         }
+
+        // Deduct stock using atomic SQL expression to avoid race conditions
+        await db
+          .update(products)
+          .set({
+            stockQuantity: sql`${products.stockQuantity} - ${required.toFixed(6)}`,
+            updatedAt: new Date(),
+          })
+          .where(eq(products.id, item.productId));
       }
+    }
 
-      // 3. Update Order Status
-      const [updated] = await tx
-        .update(orders)
-        .set({
-          status: newStatus,
-          updatedAt: new Date(),
-        })
-        .where(eq(orders.id, id))
-        .returning();
+    // --- Step 4: Stock restoration (confirmed/fulfilled → rejected/pending) ---
+    if (wasDeducted && !isDeductedNow) {
+      for (const item of items) {
+        if (!item.productId) continue;
 
-      return updated;
-    });
+        const restored = parseFloat(item.baseQuantity);
+
+        // Restore stock atomically
+        await db
+          .update(products)
+          .set({
+            stockQuantity: sql`${products.stockQuantity} + ${restored.toFixed(6)}`,
+            updatedAt: new Date(),
+          })
+          .where(eq(products.id, item.productId));
+      }
+    }
+
+    // --- Step 5: Update order status ---
+    const [updatedOrder] = await db
+      .update(orders)
+      .set({
+        status: newStatus,
+        updatedAt: new Date(),
+      })
+      .where(eq(orders.id, id))
+      .returning();
 
     return NextResponse.json(updatedOrder);
   } catch (error: any) {
